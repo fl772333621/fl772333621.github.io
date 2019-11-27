@@ -1,8 +1,17 @@
 ---
-layout: post
-category: "read"
-title:  "MySQL 面试题"
-tags: [MySQL]
+layout:     post
+title:      "MySQL面试题"
+subtitle:   "MySQL面试题"
+date:       2019-11-22 12:00:00
+author:     "MengWei"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - MySQL
+    - 面试题
+    - Myisan
+    - Innodb
+    - 事务隔离级别
 ---
 
 # 1 MySQL的复制原理及流程(BIOS)

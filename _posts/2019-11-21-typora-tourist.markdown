@@ -7,16 +7,11 @@ author:     "MengWei"
 header-img: "img/post-bg-2015.jpg"
 catalog: true
 tags:
-    - 生活
-    - Meta
+    - Typora
+    - Markdown
 ---
 
-[TOC]
-
-
 # Typora常用姿势总结
-
-
 
 ## 1 修饰
 

@@ -1,8 +1,18 @@
 ---
-layout: post
-category: "read"
-title:  "Volatile ReentrantLock synchronized"
-tags: [面试题]
+layout:     post
+title:      "volatile ReentrantLock synchronized"
+subtitle:   "volatile ReentrantLock synchronized"
+date:       2019-11-26 12:00:00
+author:     "MengWei"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - Java
+    - 面试题
+    - volatile
+    - ReentrantLock
+    - synchronized
+    - CAS
 ---
 
 # 1 volatile 能使得一个非原子操作变成原子操作吗? 
