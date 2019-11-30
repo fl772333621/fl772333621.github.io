@@ -428,7 +428,7 @@ public class SmallHeap {
     private void adjustSmallHeap(int[] heap) {
         int i = 0;
         System.out.println("新增元素heap[0]=" + heap[0]);
-        while (i < heap.length / 2 && (heap[i] > heap[left(i)] || heap[i] > heap[right(i)])) {
+        while ((left(i) < heap.length && heap[i] > heap[left(i)]) || (right(i) < heap.length && heap[i] > heap[right(i)])) {
             System.out.print("调整位置为" + i);
             System.out.print(Arrays.toString(heap));
             int ti = heap[left(i)] < heap[right(i)] ? left(i) : right(i);
