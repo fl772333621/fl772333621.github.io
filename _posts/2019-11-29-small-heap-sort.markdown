@@ -44,7 +44,7 @@ tags:
 
 元素位置交换也仅仅是int数组内index的变化，也就是位置的变化
 
-![01](img\in-post\2019-11-29-small-heap-sort\heap5-01.png)
+![01](/img/in-post/2019-11-29-small-heap-sort/heap5-01.png)
 
 ## 构建小顶堆-build()方法描述
 
@@ -56,7 +56,7 @@ tags:
 
 2. 自上而下，检测heap[index=1]=4的元素，小于heap[parent=0]=5，则交换，交换后如下图，**同时请注意，交换后index=0和1都发生了变化，需要返工，再次从index=min(0,1)开始重复**
 
-   ![01](img\in-post\2019-11-29-small-heap-sort\heap5-02.png)
+   ![01](/img/in-post/2019-11-29-small-heap-sort/heap5-02.png)
 
 3. 自上而下，检测heap[index=0]=4的元素，无parent，跳过
 
@@ -64,7 +64,7 @@ tags:
 
 5. 自上而下，检测heap[index=2]=3的元素，小于heap[parent=0]=4，则交换，交换后如下图，**同时请注意，交换后index=0和2都发生了变化，需要返工，再次从index=min(0,2)开始重复**
 
-   ![01](img\in-post\2019-11-29-small-heap-sort\heap5-03.png)
+   ![01](/img/in-post/2019-11-29-small-heap-sort/heap5-03.png)
 
 6. 自上而下，检测heap[index=0]=3的元素，无parent，跳过
 
@@ -74,11 +74,11 @@ tags:
 
 9. 自上而下，检测heap[index=3]=2的元素，小于heap[parent=1]=5，则交换，交换后如下图，**同时请注意，交换后index=1和3都发生了变化，需要返工，再次从index=min(1,3)开始重复**
 
-    ![01](img\in-post\2019-11-29-small-heap-sort\heap5-04.png)
+    ![01](/img/in-post/2019-11-29-small-heap-sort/heap5-04.png)
 
 10. 自上而下，检测heap[index=1]=2的元素，小于heap[parent=0]=3，则交换，交换后如下图，**同时请注意，交换后index=0和1都发生了变化，需要返工，再次从index=min(0,1)开始重复**
 
-    ![05](img\in-post\2019-11-29-small-heap-sort\heap5-05.png)
+    ![05](/img/in-post/2019-11-29-small-heap-sort/heap5-05.png)
 
 11. 自上而下，检测heap[index=0]=2的元素，无parent，跳过处理
 
@@ -90,11 +90,11 @@ tags:
 
 15. 自上而下，检测heap[index=4]=1的元素，小于heap[parent=1]=3，则交换，交换后如下图，**同时请注意，交换后index=1和4都发生了变化，需要返工，再次从index=min(1,4)开始重复**
 
-    ![06](img\in-post\2019-11-29-small-heap-sort\heap5-06.png)
+    ![06](/img/in-post/2019-11-29-small-heap-sort/heap5-06.png)
 
 16. 自上而下，检测heap[index=1]=1的元素，小于heap[parent=0]=2，则交换，交换后如下图，**同时请注意，交换后index=0和1都发生了变化，需要返工，再次从index=min(0,1)开始重复**
 
-    ![07](img\in-post\2019-11-29-small-heap-sort\heap5-07.png)
+    ![07](/img/in-post/2019-11-29-small-heap-sort/heap5-07.png)
 
 17. 自上而下，检测heap[index=0]=1的元素，无parent，跳过处理
 
@@ -188,7 +188,7 @@ public class SmallHeap {
 
 已知一个小顶堆heap={18, 29, 71, 56, 30}，其小顶堆样式如下图
 
-![11](img\in-post\2019-11-29-small-heap-sort\heap5-11.png)
+![11](/img/in-post/2019-11-29-small-heap-sort/heap5-11.png)
 
 依次添加93, 44, 75, 20, 65, 68, 34到小顶堆
 
@@ -196,45 +196,45 @@ public class SmallHeap {
 
 1. 检测新元素93大于heap[0]=18，替换heap[0]=93
 
-   ![12](img\in-post\2019-11-29-small-heap-sort\heap5-12.png)
+   ![12](/img/in-post/2019-11-29-small-heap-sort/heap5-12.png)
 
 2. 检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
 
 3. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
 
-   ![13](img\in-post\2019-11-29-small-heap-sort\heap5-13.png)
+   ![13](/img/in-post/2019-11-29-small-heap-sort/heap5-13.png)
 
 4. 下沉调整，当前index=1，min(heap[left(1)], heap[right(1)])=heap[right(1)]，故交换1和right(1)，index=right(1)
 
-   ![14](img\in-post\2019-11-29-small-heap-sort\heap5-14.png)
+   ![14](/img/in-post/2019-11-29-small-heap-sort/heap5-14.png)
 
 5. 下沉调整，当前index=4，无left和right，结束本次调整
 
 6. 检测新元素44大于heap[0]=29，替换heap[0]=44
 
-   ![15](img\in-post\2019-11-29-small-heap-sort\heap5-15.png)
+   ![15](/img/in-post/2019-11-29-small-heap-sort/heap5-15.png)
 
 7. 检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
 
 8. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
 
-   ![16](img\in-post\2019-11-29-small-heap-sort\heap5-16.png)
+   ![16](/img/in-post/2019-11-29-small-heap-sort/heap5-16.png)
 
 9. 下沉调整，当前index=1，left和right符合，结束本次调整
 
 10. 检测新元素75大于heap[0]=30，替换heap[0]=75
 
-    ![17](img\in-post\2019-11-29-small-heap-sort\heap5-17.png)
+    ![17](/img/in-post/2019-11-29-small-heap-sort/heap5-17.png)
 
 11. 检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
 
 12. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
 
-    ![18](img\in-post\2019-11-29-small-heap-sort\heap5-18.png)
+    ![18](/img/in-post/2019-11-29-small-heap-sort/heap5-18.png)
 
 13. 下沉调整，当前index=1，min(heap[left(1)], heap[right(1)])=heap[right(1)]，故交换1和left(1)，index=left(1)
 
-    ![19](img\in-post\2019-11-29-small-heap-sort\heap5-19.png)
+    ![19](/img/in-post/2019-11-29-small-heap-sort/heap5-19.png)
 
 14. 下沉调整，当前index=1，left和right符合，结束本次调整
 
@@ -242,25 +242,25 @@ public class SmallHeap {
 
 16. 检测新元素65大于heap[0]=44，替换heap[0]=65
 
-    ![20](img\in-post\2019-11-29-small-heap-sort\heap5-20.png)
+    ![20](/img/in-post/2019-11-29-small-heap-sort/heap5-20.png)
 
 17. 检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
 
 18. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
 
-    ![21](img\in-post\2019-11-29-small-heap-sort\heap5-21.png)
+    ![21](/img/in-post/2019-11-29-small-heap-sort/heap5-21.png)
 
 19. 下沉调整，当前index=1，left和right符合，结束本次调整
 
 20. 检测新元素68大于heap[0]=56，替换heap[0]=68
 
-    ![22](img\in-post\2019-11-29-small-heap-sort\heap5-22.png)
+    ![22](/img/in-post/2019-11-29-small-heap-sort/heap5-22.png)
 
 21. 检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
 
 22. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
 
-    ![23](img\in-post\2019-11-29-small-heap-sort\heap5-23.png)
+    ![23](/img/in-post/2019-11-29-small-heap-sort/heap5-23.png)
 
 23. 下沉调整，当前index=1，left和right符合，结束本次调整
 
