@@ -1,0 +1,120 @@
+---
+layout:     post
+title:      "Lock专题"
+subtitle:   "synchronized ReentrantLock"
+date:       2019-11-30 16:15:00
+author:     "MengWei"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - Java
+    - 面试题
+    - HashMap
+    - ConcurrentHashMap
+---
+
+# Map专题知识
+
+## HashMap的底层实现
+
+**数组加链表或红黑树**
+
+HashMap是数组结构、链表结构（或红黑树结构）和Hash算法的结合。
+
+bucket数组是HashMap的主体，而链表是为了解决哈希冲突而存在的。默认的HashMap底层是一个长度为16的bucket数组，数组内每个位置里面存放的是链表。
+
+### put方法
+
+> 1、首先根据hash算法计算key值对应bucket中的index定位到桶。
+>
+> 2、如果该处位置为空则新建一个链表并存放数据
+>
+> 3、如果该处位置不为空，则遍历链表比较equals是否相等
+>
+> > 3.1、如果相等则直接替换为新元素
+> >
+> > 3.2、如果不相等则继续遍历
+> >
+> > 3.3、如果都不相等则尾插新元素，（注意如果长度超过8需要转化链表结构为红黑树）
+
+### get方法
+
+> 首先根据hash算法计算key值对应的bucket中的index定位到桶
+>
+> 如果该处位置为null则返回null
+>
+> 如果该处位置不为null则遍历找到equals的元素返回，找不到equals的则返回null
+
+### resize方法
+
+当HashMap内的元素越来越多，碰撞的几率也越来越高，所以为了提升查询效率要进行扩容。
+
+一般来说，size>数组长度*loadFactor的时候就需要扩容，loadFactor默认为0.75。
+
+HashMap扩容过程中，原数组内的元素都需要重新计算在新数组的位置，并放进去，所以特别消耗性能。
+
+**注意是新建一个数组，长度是之前数组的两倍，然后迁移原数组的数据到新数组**
+
+
+
+##  用HashMap存储10000条数据，构造时候传10000会触发扩容吗？
+
+考虑如下的map可以放入多少元素而不触发扩容呢？
+
+```java
+Map<String, String> map = new HashMap<>(10000);
+```
+
+如下查看HashMap构造相关源码
+
+```java
+public HashMap(int initialCapacity) {
+	this(initialCapacity, DEFAULT_LOAD_FACTOR);
+}
+
+public HashMap(int initialCapacity, float loadFactor) {
+	if (initialCapacity < 0)
+		throw new IllegalArgumentException("Illegal initial capacity: " +
+										   initialCapacity);
+	if (initialCapacity > MAXIMUM_CAPACITY)
+		initialCapacity = MAXIMUM_CAPACITY;
+	if (loadFactor <= 0 || Float.isNaN(loadFactor))
+		throw new IllegalArgumentException("Illegal load factor: " +
+										   loadFactor);
+	this.loadFactor = loadFactor;
+	this.threshold = tableSizeFor(initialCapacity);
+}
+/**
+ * 这个方法看着很复杂，其实就是取最小的（2的n次方）确保（2的n次方）> cap
+ */
+static final int tableSizeFor(int cap) {
+	int n = cap - 1;
+	n |= n >>> 1;
+	n |= n >>> 2;
+	n |= n >>> 4;
+	n |= n >>> 8;
+	n |= n >>> 16;
+	return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+}
+```
+
+如上的initialCapacity=10000，则最终调用`tableSizeFor(10000) = 16384`，也就是最终数组的长度是16384，扩容因子默认是0.75，也就是HashMap的size()大于16384*0.75=12288的时候才会扩容，存放10000个元素不会触发自动扩容。
+
+>如果用HashMap存储1000条数据，构造时候传1000会触发扩容吗？
+>
+>`tableSizeFor(1000) = 1024` ，也就是数组的最终长度是1024，可以存储1024*0.75= 770.25 个元素不扩容，超过 770.25 也就是存储第771个元素的时候就需要扩容了。
+
+所以，将n个元素存储到HashMap中，保证不扩容的初始化方法是 **new HashMap<>((int) (n / 0.75));** 
+
+
+
+## ConcurrentHashMap的1.7和1.8的区别
+
+|          | JDK1.7                                                       | JDK1.8                                                       |
+| -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 整体结构 | Segment+HashEntry+Unsafe                                     | synchronized+CAS+Node+Unsafe                                 |
+| put()    | 先定位到Segment<br />再定位到桶<br />put全程加锁操作         | 直接定位到桶<br />判断first节点<br />1、为空则CAS插入<br />2、为-1表示正在扩容，则跟着一起扩容<br />3、else则加锁put |
+| get()    | 类似，value生命为volatile，保证了修改的可见性，因此为无锁获取。 | 类似，value生命为volatile，保证了修改的可见性，因此为无锁获取。 |
+| resize() | 单线程扩容，跟HashMap一样的扩容                              | 并发扩容。<br />HashMap扩容在1.8中由头插修改为尾插（避免死循环问题）<br />ConcurrentHashMap也是从尾部开始迁移<br />扩容前在桶的头部防止一个hash=-1的节点，告知别的线程该桶正在扩容 |
+| size()   | 经典的思路计算两次，如果不变则返回，否则锁住全部Segment求和  | 维护了一个baseCount'字段，直接返回该值                       |
+

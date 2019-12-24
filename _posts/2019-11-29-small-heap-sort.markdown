@@ -29,10 +29,10 @@ tags:
 
 小顶堆区分build和adjust
 
-|          | build方法                                  | adjust方法                                                   |
-| -------- | ------------------------------------------ | ------------------------------------------------------------ |
-| 构建速度 | 慢<br />因为需要检测全部节点是否符合小顶堆 | 快<br />在已知heap符合小顶堆的前提下，<br />更改heap[0]，则仅仅需要调整heap[0]即可<br />（这样很大的可能性是局部调整） |
-| 适用场景 | 重新构建小顶堆                             | 局部调整小顶堆                                               |
+|          | build方法                                  | adjust方法                                                   | sort方法 |
+| -------- | ------------------------------------------ | ------------------------------------------------------------ | -------- |
+| 构建速度 | 慢<br />因为需要检测全部节点是否符合小顶堆 | 快<br />在已知heap符合小顶堆的前提下，<br />更改heap[0]，则仅仅需要调整heap[0]即可<br />（这样很大的可能性是局部调整） | 是直接调用调整方法，所以效率一样 |
+| 适用场景 | 重新构建小顶堆                             | 局部调整小顶堆                                               | 完成构建或者调整小顶堆后的heap排序 |
 
 
 
@@ -122,7 +122,8 @@ public class SmallHeap {
 
     @Test
     public void testBuildSmallHeap() {
-        buildSmallHeap(new int[]{5, 4, 3, 2, 1});
+        int[] heap = new int[]{5, 4, 3, 2, 1};
+        buildSmallHeap(heap, heap.length);
     }
 
     /**
@@ -133,8 +134,8 @@ public class SmallHeap {
      *
      * @param heap 待构建为小顶堆的无序数组
      */
-    private void buildSmallHeap(int[] heap) {
-        for (int i = 1; i < heap.length; i++) {
+    private void buildSmallHeap(int[] heap, int heapLength) {
+        for (int i = 1; i < heapLength; i++) {
             System.out.print("准备处理,位置为" + i);
             System.out.println(Arrays.toString(heap));
             // 因为swap后需要返工，所以定义一个ti保存返工后的最新位置
@@ -290,7 +291,7 @@ public class SmallHeap {
         for (int unsortedArray : unsortedArrays) {
             if (unsortedArray > heap[0]) {
                 heap[0] = unsortedArray;
-                adjustSmallHeap(heap);
+                adjustSmallHeap(heap, heap.length);
             }
         }
     }
@@ -304,10 +305,10 @@ public class SmallHeap {
      *
      * @param heap 待构建为小顶堆的无序数组
      */
-    private void adjustSmallHeap(int[] heap) {
+    private void adjustSmallHeap(int[] heap, int heapLength) {
         int i = 0;
         System.out.println("新增元素heap[0]=" + heap[0]);
-        while ((left(i) < heap.length && heap[i] > heap[left(i)]) || (right(i) < heap.length && heap[i] > heap[right(i)])) {
+        while ((left(i) < heapLength && heap[i] > heap[left(i)]) || (right(i) < heapLength && heap[i] > heap[right(i)])) {
             System.out.print("调整位置为" + i);
             System.out.print(Arrays.toString(heap));
             int ti = heap[left(i)] < heap[right(i)] ? left(i) : right(i);
@@ -358,7 +359,66 @@ public class SmallHeap {
 完成全部调整[65, 68, 71, 75, 93]
 ```
 
-## 合并build方法和adjust方法到同一个类
+
+
+## 排序小顶堆的准备工作
+
+排序小顶堆的一个前提就是，heap已经是小顶堆了。
+
+以heap={1, 2, 4, 5, 3} 这个已经完成小顶堆有序的数组进行数组常规有序调整。调整前如下图：
+
+![30](/img/in-post/2019-11-29-small-heap-sort/heap5-30.png)
+
+
+
+## 排序小顶堆-sort()方法
+
+1. 交换小顶堆的栈顶和栈尾，逻辑设置小顶堆栈尾出栈，即新的小顶堆为heap={3, 2, 4, 5}
+
+   ![31](/img/in-post/2019-11-29-small-heap-sort/heap5-31.png)
+
+2. 进行小顶堆调整，检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
+
+3. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
+
+   ![32](/img/in-post/2019-11-29-small-heap-sort/heap5-32.png)
+
+4. 下沉调整，当前index=1，left和right符合，结束本次调整
+
+5. 交换小顶堆的栈顶和栈尾，逻辑设置小顶堆栈尾出栈，即新的小顶堆为heap={5, 3, 4}
+
+   ![33](/img/in-post/2019-11-29-small-heap-sort/heap5-33.png)
+
+6. 进行小顶堆调整，检测是否需要调整，检测heap[0]大于heap[left(0)]或heap[right(0)]，需要调整
+
+7. 下沉调整，当前index=0，min(heap[left(0)], heap[right(0)])=heap[left(0)]，故交换0和left(0)，index=left(0)
+
+   ![34](/img/in-post/2019-11-29-small-heap-sort/heap5-34.png)
+
+8. 下沉调整，当前index=1，left和right符合，结束本次调整
+
+9. 交换小顶堆的栈顶和栈尾，逻辑设置小顶堆栈尾出栈，即新的小顶堆为heap={4, 5}
+
+   ![35](/img/in-post/2019-11-29-small-heap-sort/heap5-35.png)
+
+10. 进行小顶堆调整，检测是否需要调整，检测heap[0]小于heap[left(0)]或heap[right(0)]，结束调整
+
+11. 交换小顶堆的栈顶和栈尾，逻辑设置小顶堆栈尾出栈，即新的小顶堆为heap={5}
+
+    ![36](/img/in-post/2019-11-29-small-heap-sort/heap5-36.png)
+
+12. 进行小顶堆调整，检测是否需要调整，检测heap[0]无左无右，结束调整
+
+13. 交换小顶堆的栈顶和栈尾，逻辑设置小顶堆栈尾出栈，即新的小顶堆为heap={}，停止
+
+    ![37](/img/in-post/2019-11-29-small-heap-sort/heap5-37.png)
+    
+14. 完成全部调整，完整heap={5, 4, 3, 2, 1}，已经为有序数组
+
+    
+
+
+## 排序小顶堆-sort()方法Java实现
 
 ```java
 import org.junit.Test;
@@ -367,97 +427,23 @@ import java.util.Arrays;
 public class SmallHeap {
 
     @Test
-    public void testBuildSmallHeap() {
-        buildSmallHeap(new int[]{5, 4, 3, 2, 1});
-    }
-
-    @Test
-    public void testAdjustSmallHeap() {
-        // 创建一个合规的heap
-        int[] heap = {18, 29, 71, 56, 30};
-        // 待新增的元素列表
-        int[] unsortedArrays = new int[]{93, 44, 75, 20, 65, 68, 34};
-        // 将待新增的元素逐个加入到heap中，然后调整heap
-        for (int unsortedArray : unsortedArrays) {
-            if (unsortedArray > heap[0]) {
-                heap[0] = unsortedArray;
-                adjustSmallHeap(heap);
-            }
-        }
-    }
-
-    /**
-     * 自上而下的构建小顶堆<br />
-     * 核心是做比较，parent<=我则不操作<br />
-     * parent>我则交换我和parent<br />
-     * 缺点：发生swap后需要返工，需要到swap的两个index中较小的位置处重新开始处理（这样增加了处理次数，需要while循环）<br />
-     *
-     * @param heap 待构建为小顶堆的无序数组
-     */
-    private void buildSmallHeap(int[] heap) {
-        for (int i = 1; i < heap.length; i++) {
-            System.out.print("准备处理,位置为" + i);
-            System.out.println(Arrays.toString(heap));
-            // 因为swap后需要返工，所以定义一个ti保存返工后的最新位置
-            int ti = i;
-            // 是否我的parent大于我，如果大则交换
-            while (heap[parent(ti)] > heap[ti]) {
-                int tti = parent(ti);
-                swap(heap, ti, tti);
-                System.out.print("处理位置为" + i + ", 交换 " + ti + "和" + tti + ", 最新返工位置为" + tti);
-                System.out.println(Arrays.toString(heap));
-                // 修正返工位置
-                ti = tti;
-            }
-        }
-    }
-
-    private int parent(int i) {
-        return (i - 1) / 2;
-    }
-
-    /**
-     * 调整小顶堆<br />
-     * 直接用构建小顶堆不可以吗？为什么还需要调整小顶堆？<br />
-     * 答：构建小顶堆需要检测全部节点<br />
-     * 而调整小顶堆在已知仅仅堆顶发生了变化的前提下，有可能调整很小<br />
-     * 调整方案：总体而言是大数下沉
-     *
-     * @param heap 待构建为小顶堆的无序数组
-     */
-    private void adjustSmallHeap(int[] heap) {
-        int i = 0;
-        System.out.println("新增元素heap[0]=" + heap[0]);
-        while ((left(i) < heap.length && heap[i] > heap[left(i)]) || (right(i) < heap.length && heap[i] > heap[right(i)])) {
-            System.out.print("调整位置为" + i);
-            System.out.print(Arrays.toString(heap));
-            int ti = heap[left(i)] < heap[right(i)] ? left(i) : right(i);
-            swap(heap, i, ti);
-            System.out.print(" 交换" + i + "和" + ti + " 调整后 ");
-            System.out.println(Arrays.toString(heap));
-            i = ti;
-        }
-        System.out.print("完成全部调整");
+    public void testSortSmallHeap() {
+        int[] heap = new int[]{5, 4, 3, 2, 1};
+        buildSmallHeap(heap, heap.length);
+        sortSmallHeap(heap, heap.length);
         System.out.println(Arrays.toString(heap));
     }
 
-    private int left(int i) {
-        return i * 2 + 1;
-    }
-
-    private int right(int i) {
-        return i * 2 + 2;
-    }
-
-    private void swap(int[] heap, int i, int j) {
-        int tmp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = tmp;
+    private void sortSmallHeap(int[] heap, int heapLength) {
+        while (heapLength-- > 0) {
+            System.out.println("=====" + heapLength + Arrays.toString(heap));
+            swap(heap, 0, heapLength);
+            adjustSmallHeap(heap, heapLength);
+        }
+        System.out.println("=====" + heapLength + Arrays.toString(heap));
     }
 }
 ```
-
-
 
 
 
@@ -505,6 +491,146 @@ public void findTop100In10000() {
 			adjustSmallHeap(heap);
 		}
 	}
+}
+```
+
+
+
+## 全部Java相关代码
+
+```java
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Random;
+
+public class SmallHeap {
+
+    @Test
+    public void testBuildSmallHeap() {
+        int[] heap = new int[]{5, 4, 3, 2, 1};
+        buildSmallHeap(heap, heap.length);
+    }
+
+    @Test
+    public void testAdjustSmallHeap() {
+        // 创建一个合规的heap
+        int[] heap = {18, 29, 71, 56, 30};
+        // 待新增的元素列表
+        int[] unsortedArrays = new int[]{93, 44, 75, 20, 65, 68, 34};
+        // 将待新增的元素逐个加入到heap中，然后调整heap
+        for (int unsortedArray : unsortedArrays) {
+            if (unsortedArray > heap[0]) {
+                heap[0] = unsortedArray;
+                adjustSmallHeap(heap, heap.length);
+            }
+        }
+    }
+
+    @Test
+    public void testSortSmallHeap() {
+        int[] heap = new int[]{5, 4, 3, 2, 1};
+        buildSmallHeap(heap, heap.length);
+        sortSmallHeap(heap, heap.length);
+        System.out.println(Arrays.toString(heap));
+    }
+
+
+    /**
+     * 自上而下的构建小顶堆<br />
+     * 核心是做比较，parent<=我则不操作<br />
+     * parent>我则交换我和parent<br />
+     * 缺点：发生swap后需要返工，需要到swap的两个index中较小的位置处重新开始处理（这样增加了处理次数，需要while循环）<br />
+     *
+     * @param heap 待构建为小顶堆的无序数组
+     */
+    private void buildSmallHeap(int[] heap, int heapLength) {
+        for (int i = 1; i < heapLength; i++) {
+            System.out.print("准备处理,位置为" + i);
+            System.out.println(Arrays.toString(heap));
+            // 因为swap后需要返工，所以定义一个ti保存返工后的最新位置
+            int ti = i;
+            // 是否我的parent大于我，如果大则交换
+            while (heap[parent(ti)] > heap[ti]) {
+                int tti = parent(ti);
+                swap(heap, ti, tti);
+                System.out.print("处理位置为" + i + ", 交换 " + ti + "和" + tti + ", 最新返工位置为" + tti);
+                System.out.println(Arrays.toString(heap));
+                // 修正返工位置
+                ti = tti;
+            }
+        }
+    }
+
+    private int parent(int i) {
+        return (i - 1) / 2;
+    }
+
+    /**
+     * 调整小顶堆<br />
+     * 直接用构建小顶堆不可以吗？为什么还需要调整小顶堆？<br />
+     * 答：构建小顶堆需要检测全部节点<br />
+     * 而调整小顶堆在已知仅仅堆顶发生了变化的前提下，有可能调整很小<br />
+     * 调整方案：总体而言是大数下沉
+     *
+     * @param heap 待构建为小顶堆的无序数组
+     */
+    private void adjustSmallHeap(int[] heap, int heapLength) {
+        int i = 0;
+        System.out.println("新增元素heap[0]=" + heap[0]);
+        while ((left(i) < heapLength && heap[i] > heap[left(i)]) || (right(i) < heapLength && heap[i] > heap[right(i)])) {
+            System.out.print("调整位置为" + i);
+            System.out.print(Arrays.toString(heap));
+            int ti = heap[left(i)] < heap[right(i)] ? left(i) : right(i);
+            swap(heap, i, ti);
+            System.out.print(" 交换" + i + "和" + ti + " 调整后 ");
+            System.out.println(Arrays.toString(heap));
+            i = ti;
+        }
+        System.out.print("完成全部调整");
+        System.out.println(Arrays.toString(heap));
+    }
+
+    private int left(int i) {
+        return i * 2 + 1;
+    }
+
+    private int right(int i) {
+        return i * 2 + 2;
+    }
+
+    private void swap(int[] heap, int i, int j) {
+        int tmp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = tmp;
+    }
+
+    private void sortSmallHeap(int[] heap, int heapLength) {
+        while (heapLength-- > 0) {
+            System.out.println("=====" + heapLength + Arrays.toString(heap));
+            swap(heap, 0, heapLength);
+            adjustSmallHeap(heap, heapLength);
+        }
+        System.out.println("=====" + heapLength + Arrays.toString(heap));
+    }
+
+    @Test
+    public void findTop100In10000() {
+        int[] unsortedArrays = new int[1_0000];
+        Random random = new Random();
+        for (int i = 0; i < unsortedArrays.length; i++) unsortedArrays[i] = random.nextInt();
+        // 创建一个长度为100的heap
+        int[] heap = Arrays.copyOfRange(unsortedArrays, 0, 100);
+        // 将heap构建为小顶堆
+        buildSmallHeap(heap, heap.length);
+        // 剩余元素逐个添加入heap并调整heap
+        for (int i = heap.length; i < unsortedArrays.length; i++) {
+            if (unsortedArrays[i] > heap[0]) {
+                heap[0] = unsortedArrays[i];
+                adjustSmallHeap(heap, heap.length);
+            }
+        }
+    }
 }
 ```
 
