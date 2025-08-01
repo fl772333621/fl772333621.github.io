@@ -156,9 +156,7 @@ eg
 ![我是来自百度的一张图片](https://box.bdimg.com/static/fisp_static/common/img/searchbox/logo_news_276_88_1f9876a.png)
 
 本地相对路径图片示例：
-![我是本地图片](../img/avatar.png)
-
-本地图片的存储位置（）：
+![我是本地图片](/img/avatar.png)
 
 ### 5.2 网络链接
 
